@@ -5,9 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Apple Vision Pro | Co-Branding & Customization</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=JetBrains+Mono:wght@400;500&family=Dancing+Script:wght@400;700&family=Pacifico&family=Impact&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=JetBrains+Mono:wght@400;500&family=Pacifico&family=Impact&display=swap');
         
         * {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -17,10 +18,8 @@
             background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0f0f0f 100%);
             color: #f5f5f7;
             overflow-x: hidden;
-            user-select: none;
         }
         
-        /* Glassmorphism effect */
         .glass {
             background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(20px) saturate(180%);
@@ -35,106 +34,22 @@
             border: 1px solid rgba(255, 255, 255, 0.15);
         }
         
-        /* Clean neutral preview area - NO tints */
-        .preview-container {
-            background: #1c1c1e;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            cursor: grab;
-        }
-        
-        .preview-container:active {
-            cursor: grabbing;
-        }
-        
-        /* 3D Container */
-        .scene-3d {
-            perspective: 1000px;
-            perspective-origin: center center;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .object-3d {
-            transform-style: preserve-3d;
-            transition: transform 0.1s ease-out;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .object-3d.auto-rotating {
-            transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
-        /* AVP Device in 3D */
-        .avp-device-3d {
-            transform-style: preserve-3d;
+        /* Left viewer area: no box, blends into background */
+        .viewer-area {
+            min-height: 500px;
             position: relative;
-            width: 70%;
-            height: 70%;
         }
         
-        .avp-device-3d .device-body {
+        .viewer-area model-viewer {
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, #2a2a2e 0%, #1a1a1c 100%);
-            border-radius: 2rem;
-            border: 2px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-            position: relative;
-            transform-style: preserve-3d;
+            min-height: 500px;
+            --poster-color: transparent;
+            --progress-bar-color: rgba(255, 255, 255, 0.3);
         }
         
-        /* Material color overlay */
-        .material-overlay {
-            position: absolute;
-            inset: 0;
-            border-radius: 2rem;
-            mix-blend-mode: overlay;
-            opacity: 0;
-            transition: opacity 0.4s ease, background-color 0.4s ease;
-            pointer-events: none;
-        }
-        
-        .material-overlay.visible {
-            opacity: 0.3;
-        }
-        
-        /* 3D Engraving Text */
-        .engraving-text-3d {
-            position: absolute;
-            transform-style: preserve-3d;
-            font-weight: 300;
-            letter-spacing: 0.1em;
-            pointer-events: none;
-            white-space: nowrap;
-            transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1), 
-                        font-family 0.3s ease,
-                        font-size 0.3s ease,
-                        color 0.3s ease;
-        }
-        
-        .engraving-text-3d.position-top {
-            top: 10%;
-            left: 50%;
-            transform: translateX(-50%) translateZ(50px);
-        }
-        
-        .engraving-text-3d.position-bottom {
-            bottom: 10%;
-            left: 50%;
-            transform: translateX(-50%) translateZ(50px);
-        }
-        
-        .engraving-text-3d.position-side {
-            top: 50%;
-            right: -5%;
-            transform: translateY(-50%) rotateY(90deg) translateZ(50px);
+        .viewer-area model-viewer::part(default-progress-bar) {
+            display: none;
         }
         
         /* Tab navigation */
@@ -165,21 +80,40 @@
             display: block;
         }
         
-        /* Brand card hover effect */
+        /* Brand cards: fixed size */
         .brand-card {
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            width: 160px;
+            min-width: 160px;
+            height: 200px;
+            flex-shrink: 0;
             scroll-snap-align: start;
+            transition: all 0.3s ease;
         }
         
         .brand-card:hover {
-            transform: scale(1.05) translateY(-8px);
+            transform: scale(1.05) translateY(-4px);
         }
         
         .brand-card.selected {
             border: 2px solid rgba(255, 255, 255, 0.5);
         }
         
-        /* Horizontal scroll for brands */
+        .brand-card .logo-wrap {
+            width: 100%;
+            height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .brand-card .logo-wrap img {
+            width: 25%;
+            height: 25%;
+            min-width: 32px;
+            min-height: 32px;
+            object-fit: contain;
+        }
+        
         .brand-scroll-container {
             overflow-x: auto;
             scroll-snap-type: x mandatory;
@@ -191,10 +125,9 @@
             display: none;
         }
         
-        /* Visual Rewards Grid */
         .rewards-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
             gap: 1rem;
         }
         
@@ -202,13 +135,13 @@
             background: rgba(0, 0, 0, 0.3);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 1rem;
-            padding: 1.5rem;
+            padding: 1.25rem;
             transition: all 0.3s ease;
         }
         
         .reward-card:hover {
             border-color: rgba(255, 255, 255, 0.3);
-            transform: translateY(-4px);
+            transform: translateY(-2px);
         }
         
         .reward-image-placeholder {
@@ -219,16 +152,14 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 1rem;
-            font-size: 2rem;
+            margin-bottom: 0.75rem;
+            font-size: 1.5rem;
         }
         
-        /* Smooth scroll */
         html {
             scroll-behavior: smooth;
         }
         
-        /* Custom scrollbar */
         ::-webkit-scrollbar {
             width: 8px;
         }
@@ -242,58 +173,54 @@
             border-radius: 4px;
         }
         
-        ::-webkit-scrollbar-thumb:hover {
-            background: rgba(255, 255, 255, 0.3);
-        }
-        
-        /* Sticky bottom bar */
-        .sticky-bottom {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            z-index: 100;
-            transform: translateY(100%);
-            transition: transform 0.3s ease;
-        }
-        
-        .sticky-bottom.visible {
-            transform: translateY(0);
-        }
-        
-        /* Price animation */
-        @keyframes priceBounce {
-            0%, 100% {
-                transform: scale(1);
-            }
-            50% {
-                transform: scale(1.1);
-            }
-        }
-        
         .price-bounce {
             animation: priceBounce 0.5s ease;
         }
         
-        /* Drag hint */
-        .drag-hint {
-            position: absolute;
-            bottom: 2rem;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 0.875rem;
-            color: rgba(255, 255, 255, 0.5);
-            pointer-events: none;
-            opacity: 0;
-            transition: opacity 0.3s ease;
+        @keyframes priceBounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
         }
         
-        .drag-hint.visible {
+        /* Toast notification */
+        .toast {
+            position: fixed;
+            top: 2rem;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            z-index: 1000;
+            padding: 1rem 2rem;
+            background: rgba(255, 255, 255, 0.95);
+            color: #1a1a1a;
+            border-radius: 12px;
+            font-weight: 500;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease;
+        }
+        
+        .toast.visible {
+            transform: translateX(-50%) translateY(0);
             opacity: 1;
+        }
+        
+        .toast.fade-out {
+            opacity: 0;
+            transform: translateX(-50%) translateY(-20px);
+        }
+        
+        .btn-added {
+            background: #22c55e !important;
+            color: white !important;
         }
     </style>
 </head>
 <body>
+    <!-- Toast (hidden by default) -->
+    <div id="toast" class="toast" aria-live="polite">
+        Apple Vision Pro added to your cart.
+    </div>
+
     <!-- Hero Section -->
     <section id="hero" class="min-h-screen flex items-center justify-center relative overflow-hidden">
         <div class="container mx-auto px-6 text-center z-10">
@@ -312,8 +239,6 @@
                 Start Exploring
             </button>
         </div>
-        
-        <!-- Scroll indicator -->
         <div class="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce">
             <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
@@ -321,126 +246,116 @@
         </div>
     </section>
 
-    <!-- Main Content Area -->
+    <!-- Main Content -->
     <section id="main-content" class="min-h-screen py-20 px-6">
-        <div class="container mx-auto max-w-[95vw]">
-            <!-- Top Navigation Tabs -->
+        <div class="container mx-auto max-w-7xl">
             <div class="flex justify-center mb-12 border-b border-white/10">
-                <button 
-                    id="tab-co-branded"
-                    onclick="switchTab('co-branded')"
-                    class="tab-button active px-8 py-4 text-lg font-medium text-gray-400 hover:text-white"
-                >
+                <button id="tab-co-branded" onclick="switchTab('co-branded')" class="tab-button active px-8 py-4 text-lg font-medium text-gray-400 hover:text-white">
                     Co-Branded Editions
                 </button>
-                <button 
-                    id="tab-personalize"
-                    onclick="switchTab('personalize')"
-                    class="tab-button px-8 py-4 text-lg font-medium text-gray-400 hover:text-white"
-                >
+                <button id="tab-personalize" onclick="switchTab('personalize')" class="tab-button px-8 py-4 text-lg font-medium text-gray-400 hover:text-white">
                     Personalize Your Own
                 </button>
             </div>
 
             <!-- TAB 1: Co-Branded Editions -->
             <div id="content-co-branded" class="tab-content active">
-                <!-- Brand Selector -->
-                <div class="mb-12">
+                <div class="mb-10">
                     <h2 class="text-3xl font-light mb-6 text-center">Select Your Edition</h2>
-                    <div class="brand-scroll-container flex gap-6 pb-4">
-                        <div class="brand-card glass-strong rounded-2xl p-6 cursor-pointer min-w-[200px] flex-shrink-0" onclick="selectCoBrand('rolex')">
-                            <div class="aspect-square bg-gradient-to-br from-yellow-900 to-yellow-700 rounded-xl mb-4 flex items-center justify-center">
-                                <div class="text-5xl font-bold text-white opacity-80">⌚</div>
+                    <div class="brand-scroll-container flex gap-4 pb-2 justify-center flex-wrap md:flex-nowrap md:justify-start">
+                        <div class="brand-card glass-strong rounded-2xl p-4 cursor-pointer flex flex-col items-center justify-between" onclick="selectCoBrand('rolex', this)">
+                            <div class="logo-wrap flex-1">
+                                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext x='50' y='55' font-size='50' text-anchor='middle' fill='%23d4af37'%3E⌚%3C/text%3E%3C/svg%3E" alt="Rolex" />
                             </div>
-                            <h3 class="text-xl font-medium mb-1 text-center">Rolex</h3>
+                            <h3 class="text-sm font-medium text-center">Rolex</h3>
                         </div>
-                        <div class="brand-card glass-strong rounded-2xl p-6 cursor-pointer min-w-[200px] flex-shrink-0" onclick="selectCoBrand('porsche')">
-                            <div class="aspect-square bg-gradient-to-br from-red-900 to-red-800 rounded-xl mb-4 flex items-center justify-center">
-                                <div class="text-5xl font-bold text-white opacity-80">🏎️</div>
+                        <div class="brand-card glass-strong rounded-2xl p-4 cursor-pointer flex flex-col items-center justify-between" onclick="selectCoBrand('porsche', this)">
+                            <div class="logo-wrap flex-1">
+                                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext x='50' y='55' font-size='50' text-anchor='middle' fill='%23c8102e'%3E🏎%3C/text%3E%3C/svg%3E" alt="Porsche" />
                             </div>
-                            <h3 class="text-xl font-medium mb-1 text-center">Porsche</h3>
+                            <h3 class="text-sm font-medium text-center">Porsche</h3>
                         </div>
-                        <div class="brand-card glass-strong rounded-2xl p-6 cursor-pointer min-w-[200px] flex-shrink-0" onclick="selectCoBrand('louisvuitton')">
-                            <div class="aspect-square bg-gradient-to-br from-amber-900 to-amber-700 rounded-xl mb-4 flex items-center justify-center">
-                                <div class="text-5xl font-bold text-white opacity-80">👜</div>
+                        <div class="brand-card glass-strong rounded-2xl p-4 cursor-pointer flex flex-col items-center justify-between" onclick="selectCoBrand('louisvuitton', this)">
+                            <div class="logo-wrap flex-1">
+                                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext x='50' y='55' font-size='50' text-anchor='middle' fill='%23c9a961'%3E👜%3C/text%3E%3C/svg%3E" alt="Louis Vuitton" />
                             </div>
-                            <h3 class="text-xl font-medium mb-1 text-center">Louis Vuitton</h3>
+                            <h3 class="text-sm font-medium text-center">Louis Vuitton</h3>
                         </div>
-                        <div class="brand-card glass-strong rounded-2xl p-6 cursor-pointer min-w-[200px] flex-shrink-0" onclick="selectCoBrand('starbucks')">
-                            <div class="aspect-square bg-gradient-to-br from-green-900 to-green-700 rounded-xl mb-4 flex items-center justify-center">
-                                <div class="text-5xl font-bold text-white opacity-80">☕</div>
+                        <div class="brand-card glass-strong rounded-2xl p-4 cursor-pointer flex flex-col items-center justify-between" onclick="selectCoBrand('starbucks', this)">
+                            <div class="logo-wrap flex-1">
+                                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext x='50' y='55' font-size='50' text-anchor='middle' fill='%2300704a'%3E☕%3C/text%3E%3C/svg%3E" alt="Starbucks" />
                             </div>
-                            <h3 class="text-xl font-medium mb-1 text-center">Starbucks</h3>
+                            <h3 class="text-sm font-medium text-center">Starbucks</h3>
                         </div>
-                        <div class="brand-card glass-strong rounded-2xl p-6 cursor-pointer min-w-[200px] flex-shrink-0" onclick="selectCoBrand('nike')">
-                            <div class="aspect-square bg-gradient-to-br from-black to-gray-800 rounded-xl mb-4 flex items-center justify-center">
-                                <div class="text-5xl font-bold text-white opacity-80">✓</div>
+                        <div class="brand-card glass-strong rounded-2xl p-4 cursor-pointer flex flex-col items-center justify-between" onclick="selectCoBrand('nike', this)">
+                            <div class="logo-wrap flex-1">
+                                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext x='50' y='55' font-size='50' text-anchor='middle' fill='%23fff'%3E✓%3C/text%3E%3C/svg%3E" alt="Nike" />
                             </div>
-                            <h3 class="text-xl font-medium mb-1 text-center">Nike</h3>
+                            <h3 class="text-sm font-medium text-center">Nike</h3>
                         </div>
-                        <div class="brand-card glass-strong rounded-2xl p-6 cursor-pointer min-w-[200px] flex-shrink-0" onclick="selectCoBrand('supreme')">
-                            <div class="aspect-square bg-gradient-to-br from-red-600 to-red-800 rounded-xl mb-4 flex items-center justify-center">
-                                <div class="text-5xl font-bold text-white opacity-80">⬛</div>
+                        <div class="brand-card glass-strong rounded-2xl p-4 cursor-pointer flex flex-col items-center justify-between" onclick="selectCoBrand('supreme', this)">
+                            <div class="logo-wrap flex-1">
+                                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext x='50' y='55' font-size='50' text-anchor='middle' fill='%23fff'%3E⬛%3C/text%3E%3C/svg%3E" alt="Supreme" />
                             </div>
-                            <h3 class="text-xl font-medium mb-1 text-center">Supreme</h3>
+                            <h3 class="text-sm font-medium text-center">Supreme</h3>
                         </div>
-                        <div class="brand-card glass-strong rounded-2xl p-6 cursor-pointer min-w-[200px] flex-shrink-0" onclick="selectCoBrand('lego')">
-                            <div class="aspect-square bg-gradient-to-br from-yellow-600 to-red-600 rounded-xl mb-4 flex items-center justify-center">
-                                <div class="text-5xl font-bold text-white opacity-80">🧱</div>
+                        <div class="brand-card glass-strong rounded-2xl p-4 cursor-pointer flex flex-col items-center justify-between" onclick="selectCoBrand('lego', this)">
+                            <div class="logo-wrap flex-1">
+                                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext x='50' y='55' font-size='50' text-anchor='middle' fill='%23ffd700'%3E🧱%3C/text%3E%3C/svg%3E" alt="Lego" />
                             </div>
-                            <h3 class="text-xl font-medium mb-1 text-center">Lego</h3>
+                            <h3 class="text-sm font-medium text-center">Lego</h3>
                         </div>
-                        <div class="brand-card glass-strong rounded-2xl p-6 cursor-pointer min-w-[200px] flex-shrink-0" onclick="selectCoBrand('nasa')">
-                            <div class="aspect-square bg-gradient-to-br from-blue-900 to-blue-700 rounded-xl mb-4 flex items-center justify-center">
-                                <div class="text-5xl font-bold text-white opacity-80">🚀</div>
+                        <div class="brand-card glass-strong rounded-2xl p-4 cursor-pointer flex flex-col items-center justify-between" onclick="selectCoBrand('nasa', this)">
+                            <div class="logo-wrap flex-1">
+                                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext x='50' y='55' font-size='50' text-anchor='middle' fill='%23003d82'%3E🚀%3C/text%3E%3C/svg%3E" alt="NASA" />
                             </div>
-                            <h3 class="text-xl font-medium mb-1 text-center">NASA</h3>
+                            <h3 class="text-sm font-medium text-center">NASA</h3>
                         </div>
-                        <div class="brand-card glass-strong rounded-2xl p-6 cursor-pointer min-w-[200px] flex-shrink-0" onclick="selectCoBrand('balenciaga')">
-                            <div class="aspect-square bg-gradient-to-br from-gray-800 to-black rounded-xl mb-4 flex items-center justify-center">
-                                <div class="text-5xl font-bold text-white opacity-80">👔</div>
+                        <div class="brand-card glass-strong rounded-2xl p-4 cursor-pointer flex flex-col items-center justify-between" onclick="selectCoBrand('balenciaga', this)">
+                            <div class="logo-wrap flex-1">
+                                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext x='50' y='55' font-size='50' text-anchor='middle' fill='%23fff'%3E👔%3C/text%3E%3C/svg%3E" alt="Balenciaga" />
                             </div>
-                            <h3 class="text-xl font-medium mb-1 text-center">Balenciaga</h3>
+                            <h3 class="text-sm font-medium text-center">Balenciaga</h3>
                         </div>
-                        <div class="brand-card glass-strong rounded-2xl p-6 cursor-pointer min-w-[200px] flex-shrink-0" onclick="selectCoBrand('kaws')">
-                            <div class="aspect-square bg-gradient-to-br from-purple-900 to-pink-700 rounded-xl mb-4 flex items-center justify-center">
-                                <div class="text-5xl font-bold text-white opacity-80">🎨</div>
+                        <div class="brand-card glass-strong rounded-2xl p-4 cursor-pointer flex flex-col items-center justify-between" onclick="selectCoBrand('kaws', this)">
+                            <div class="logo-wrap flex-1">
+                                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext x='50' y='55' font-size='50' text-anchor='middle' fill='%23a855f7'%3E🎨%3C/text%3E%3C/svg%3E" alt="KAWS" />
                             </div>
-                            <h3 class="text-xl font-medium mb-1 text-center">KAWS</h3>
+                            <h3 class="text-sm font-medium text-center">KAWS</h3>
                         </div>
                     </div>
                 </div>
 
-                <!-- Content Display -->
-                <div class="grid grid-cols-1 lg:grid-cols-[65%_35%] gap-8">
-                    <!-- Left: Product Preview (3D) -->
-                    <div class="preview-container rounded-3xl p-8 lg:p-12 flex items-center justify-center relative min-h-[600px]">
-                        <div class="scene-3d w-full h-full">
-                            <div id="object-3d-co" class="object-3d">
-                                <div class="avp-device-3d">
-                                    <div class="device-body">
-                                        <div class="text-center absolute inset-0 flex items-center justify-center">
-                                            <div class="text-8xl mb-4" id="co-brand-icon">🥽</div>
-                                        </div>
-                                        <div class="material-overlay" id="co-material-overlay"></div>
-                                    </div>
-                                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-[55%_45%] gap-8">
+                    <!-- Left: True 3D viewer (no box, blends in) -->
+                    <div class="viewer-area flex items-center justify-center">
+                        <model-viewer
+                            id="model-viewer-co"
+                            src="assets/avp.glb"
+                            alt="Apple Vision Pro Co-Branded"
+                            camera-controls
+                            disable-zoom
+                            camera-orbit="0deg 75deg 2.5m"
+                            min-camera-orbit="auto auto 1.5m"
+                            max-camera-orbit="auto auto 4m"
+                            style="width:100%;height:100%;min-height:500px;"
+                        >
+                            <div class="absolute inset-0 flex items-center justify-center bg-transparent" slot="poster">
+                                <span class="text-8xl opacity-50">🥽</span>
                             </div>
-                        </div>
-                        <div class="drag-hint" id="drag-hint-co">Click and drag to rotate</div>
+                        </model-viewer>
                     </div>
 
                     <!-- Right: Story & Rewards -->
-                    <div class="space-y-6">
+                    <div class="space-y-6 flex flex-col">
                         <div class="glass rounded-2xl p-6">
-                            <h3 class="text-2xl font-medium mb-4" id="co-brand-title">Select an Edition</h3>
+                            <h3 class="text-xl font-medium mb-3" id="co-brand-title">Select an Edition</h3>
                             <div id="co-brand-story" class="text-gray-300 leading-relaxed text-sm">
-                                <p>Choose a co-branded edition above to view its unique story and exclusive rewards.</p>
+                                <p>Choose a co-branded edition above to view its story and rewards.</p>
                             </div>
                         </div>
-
                         <div class="glass rounded-2xl p-6">
-                            <h3 class="text-xl font-medium mb-4">Exclusive Rewards</h3>
+                            <h3 class="text-lg font-medium mb-3">Exclusive Rewards</h3>
                             <div id="co-brand-rewards" class="rewards-grid">
                                 <div class="reward-card">
                                     <div class="reward-image-placeholder">📦</div>
@@ -448,14 +363,16 @@
                                 </div>
                             </div>
                         </div>
-
-                        <div class="glass-strong rounded-2xl p-6">
+                        <!-- Price & Add to Bag at bottom of right panel -->
+                        <div class="glass-strong rounded-2xl p-6 mt-auto">
                             <div class="flex flex-col gap-4">
                                 <div>
                                     <div class="text-sm text-gray-400 mb-1">Price</div>
-                                    <div id="co-brand-price" class="text-4xl font-light">$3,499</div>
+                                    <div id="co-brand-price" class="text-3xl font-light">$3,499</div>
                                 </div>
-                                <button 
+                                <button
+                                    id="btn-add-co"
+                                    type="button"
                                     onclick="addCoBrandToBag()"
                                     class="w-full px-8 py-4 bg-white text-black rounded-full text-lg font-medium hover:bg-gray-100 transition-all duration-300"
                                 >
@@ -469,79 +386,51 @@
 
             <!-- TAB 2: Personalize Your Own -->
             <div id="content-personalize" class="tab-content">
-                <div class="grid grid-cols-1 lg:grid-cols-[65%_35%] gap-8">
-                    <!-- Left: 3D Live Preview -->
-                    <div class="preview-container rounded-3xl p-8 lg:p-12 flex items-center justify-center relative min-h-[600px]">
-                        <div class="scene-3d w-full h-full">
-                            <div id="object-3d-personalize" class="object-3d">
-                                <div class="avp-device-3d">
-                                    <div class="device-body">
-                                        <div class="text-center absolute inset-0 flex items-center justify-center">
-                                            <div class="text-8xl mb-4">🥽</div>
-                                        </div>
-                                        
-                                        <!-- Material Color Overlay -->
-                                        <div id="material-overlay" class="material-overlay"></div>
-                                        
-                                        <!-- 3D Engraving Text -->
-                                        <div id="engraving-text-3d" class="engraving-text-3d"></div>
-                                    </div>
-                                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-[55%_45%] gap-8">
+                    <!-- Left: True 3D viewer -->
+                    <div class="viewer-area flex items-center justify-center">
+                        <model-viewer
+                            id="model-viewer-personalize"
+                            src="assets/avp.glb"
+                            alt="Apple Vision Pro"
+                            camera-controls
+                            disable-zoom
+                            camera-orbit="0deg 75deg 2.5m"
+                            min-camera-orbit="auto auto 1.5m"
+                            max-camera-orbit="auto auto 4m"
+                            style="width:100%;height:100%;min-height:500px;"
+                        >
+                            <div class="absolute inset-0 flex items-center justify-center bg-transparent" slot="poster">
+                                <span class="text-8xl opacity-50">🥽</span>
                             </div>
-                        </div>
-                        <div class="drag-hint visible" id="drag-hint-personalize">Click and drag to rotate</div>
+                        </model-viewer>
                     </div>
 
-                    <!-- Right: Customization Tools -->
-                    <div class="space-y-6">
-                        <!-- Material & Color -->
+                    <!-- Right: Customization + Price at bottom -->
+                    <div class="space-y-6 flex flex-col">
                         <div class="glass rounded-2xl p-6">
                             <h3 class="text-xl font-medium mb-4">Material & Color</h3>
                             <div class="mb-4">
-                                <label class="text-sm font-medium text-gray-300 mb-2 block">Select Material</label>
-                                <select 
-                                    id="material-select"
-                                    onchange="updateMaterial()"
-                                    class="w-full px-4 py-3 bg-black/30 border border-white/10 rounded-xl text-white focus:outline-none focus:border-blue-500 transition-colors text-sm"
-                                >
+                                <label class="text-sm font-medium text-gray-300 mb-2 block">Material</label>
+                                <select id="material-select" onchange="updateMaterial()" class="w-full px-4 py-3 bg-black/30 border border-white/10 rounded-xl text-white focus:outline-none focus:border-blue-500 text-sm">
                                     <option value="leather">Premium Leather</option>
                                     <option value="knit">Knit</option>
                                     <option value="silicone">Silicone</option>
                                 </select>
                             </div>
-                            <div>
-                                <label class="text-sm font-medium text-gray-300 mb-2 block">Select Color</label>
-                                <div id="color-options" class="grid grid-cols-4 gap-3">
-                                    <!-- Colors will be populated by JavaScript -->
-                                </div>
-                            </div>
+                            <label class="text-sm font-medium text-gray-300 mb-2 block">Color</label>
+                            <div id="color-options" class="grid grid-cols-4 gap-3"></div>
                         </div>
 
-                        <!-- Advanced Engraving -->
                         <div class="glass rounded-2xl p-6">
                             <h3 class="text-xl font-medium mb-4">Advanced Engraving</h3>
-                            
-                            <!-- Text Input -->
                             <div class="mb-4">
                                 <label class="text-sm font-medium text-gray-300 mb-2 block">Custom Text</label>
-                                <input 
-                                    type="text" 
-                                    id="engraving-text"
-                                    placeholder="Enter your custom text (max 30 characters)"
-                                    maxlength="30"
-                                    class="w-full px-4 py-3 bg-black/30 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 transition-colors text-sm"
-                                    oninput="updateEngravingPreview()"
-                                />
+                                <input type="text" id="engraving-text" placeholder="Max 30 characters" maxlength="30" class="w-full px-4 py-3 bg-black/30 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 text-sm" oninput="updateEngravingPreview()" />
                             </div>
-
-                            <!-- Font Family -->
                             <div class="mb-4">
-                                <label class="text-sm font-medium text-gray-300 mb-2 block">Font Family</label>
-                                <select 
-                                    id="engraving-font"
-                                    onchange="updateEngravingPreview()"
-                                    class="w-full px-4 py-3 bg-black/30 border border-white/10 rounded-xl text-white focus:outline-none focus:border-blue-500 transition-colors text-sm"
-                                >
+                                <label class="text-sm font-medium text-gray-300 mb-2 block">Font</label>
+                                <select id="engraving-font" onchange="updateEngravingPreview()" class="w-full px-4 py-3 bg-black/30 border border-white/10 rounded-xl text-white focus:outline-none focus:border-blue-500 text-sm">
                                     <option value="Arial">Arial</option>
                                     <option value="Times New Roman">Times New Roman</option>
                                     <option value="Impact">Impact</option>
@@ -550,55 +439,44 @@
                                     <option value="Verdana">Verdana</option>
                                     <option value="Georgia">Georgia</option>
                                     <option value="Comic Sans MS">Comic Sans MS</option>
-                                    <option value="Playfair Display">Playfair Display</option>
-                                    <option value="JetBrains Mono">JetBrains Mono</option>
                                 </select>
                             </div>
-
-                            <!-- Font Size -->
                             <div class="mb-4">
-                                <label class="text-sm font-medium text-gray-300 mb-2 block">
-                                    Font Size: <span id="font-size-value">24</span>px
-                                </label>
-                                <input 
-                                    type="range" 
-                                    id="engraving-size"
-                                    min="12"
-                                    max="48"
-                                    value="24"
-                                    step="1"
-                                    oninput="updateFontSizeDisplay(); updateEngravingPreview();"
-                                    class="w-full"
-                                />
+                                <label class="text-sm font-medium text-gray-300 mb-2 block">Font Size: <span id="font-size-value">24</span>px</label>
+                                <input type="range" id="engraving-size" min="12" max="48" value="24" step="1" oninput="updateFontSizeDisplay(); updateEngravingPreview();" class="w-full" />
                             </div>
-
-                            <!-- Text Color -->
                             <div class="mb-4">
                                 <label class="text-sm font-medium text-gray-300 mb-2 block">Text Color</label>
                                 <div class="flex items-center gap-4">
-                                    <input 
-                                        type="color" 
-                                        id="engraving-color"
-                                        value="#ffffff"
-                                        onchange="updateEngravingPreview()"
-                                        class="w-12 h-12 rounded-lg cursor-pointer border-2 border-white/20"
-                                    />
+                                    <input type="color" id="engraving-color" value="#ffffff" onchange="updateEngravingPreview()" class="w-12 h-12 rounded-lg cursor-pointer border-2 border-white/20" />
                                     <span id="color-hex" class="text-gray-400 text-xs">#ffffff</span>
                                 </div>
                             </div>
-
-                            <!-- Text Position -->
                             <div>
                                 <label class="text-sm font-medium text-gray-300 mb-2 block">Text Position</label>
-                                <select 
-                                    id="engraving-position"
-                                    onchange="updateEngravingPreview(); rotateToPosition();"
-                                    class="w-full px-4 py-3 bg-black/30 border border-white/10 rounded-xl text-white focus:outline-none focus:border-blue-500 transition-colors text-sm"
-                                >
+                                <select id="engraving-position" onchange="updateEngravingPreview()" class="w-full px-4 py-3 bg-black/30 border border-white/10 rounded-xl text-white focus:outline-none focus:border-blue-500 text-sm">
                                     <option value="top">Top Frame</option>
                                     <option value="bottom">Bottom Lens</option>
                                     <option value="side">Side Band</option>
                                 </select>
+                            </div>
+                        </div>
+
+                        <!-- Price & Add to Bag at bottom of right panel -->
+                        <div class="glass-strong rounded-2xl p-6 mt-auto">
+                            <div class="flex flex-col gap-4">
+                                <div>
+                                    <div class="text-sm text-gray-400 mb-1">Starting from</div>
+                                    <div id="price-display" class="text-3xl font-light">$3,499</div>
+                                </div>
+                                <button
+                                    id="btn-add-personalize"
+                                    type="button"
+                                    onclick="addPersonalizeToBag()"
+                                    class="w-full px-8 py-4 bg-white text-black rounded-full text-lg font-medium hover:bg-gray-100 transition-all duration-300"
+                                >
+                                    Add to Bag
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -607,563 +485,206 @@
         </div>
     </section>
 
-    <!-- Preview & Checkout Sticky Bar -->
-    <div id="sticky-checkout" class="sticky-bottom glass-strong border-t border-white/10">
-        <div class="container mx-auto px-6 py-6">
-            <div class="flex items-center justify-between">
-                <div>
-                    <div class="text-sm text-gray-400 mb-1">Starting from</div>
-                    <div id="price-display" class="text-3xl font-light">$3,499</div>
-                </div>
-                <button 
-                    onclick="addToBag()"
-                    class="px-12 py-4 bg-white text-black rounded-full text-lg font-medium hover:bg-gray-100 transition-all duration-300"
-                >
-                    Add to Bag
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Footer -->
     <footer class="py-12 px-6 border-t border-white/5">
         <div class="container mx-auto max-w-4xl">
             <p class="text-xs text-gray-500 text-center leading-relaxed">
-                Disclaimer: This project is a conceptual prototype created solely for the CraterHacks 404 Hackathon. 
-                It is an educational exploration of consumer psychology and UI/UX design. 
-                Not affiliated with Apple Inc. or any mentioned brands.
+                Disclaimer: This project is a conceptual prototype created solely for the CraterHacks 404 Hackathon. Not affiliated with Apple Inc. or any mentioned brands.
             </p>
         </div>
     </footer>
 
     <script>
-        // State management
         let currentTab = 'co-branded';
         let selectedCoBrand = null;
         let selectedMaterial = 'leather';
         let selectedColor = null;
-        let engravingConfig = {
-            text: '',
-            font: 'Arial',
-            size: 24,
-            color: '#ffffff',
-            position: 'top'
-        };
+        let engravingConfig = { text: '', font: 'Arial', size: 24, color: '#ffffff', position: 'top' };
         let basePrice = 3499;
         let currentPrice = basePrice;
 
-        // 3D Rotation State
-        let isDragging = false;
-        let startX = 0;
-        let startY = 0;
-        let rotationX = 0;
-        let rotationY = 0;
-        let currentRotationX = 0;
-        let currentRotationY = 0;
-
-        // Co-branded editions data
         const coBrandData = {
-            rolex: {
-                name: 'Rolex Edition',
-                icon: '⌚',
-                title: 'Rolex Edition Vision Pro',
-                story: 'Merging timeless Swiss craftsmanship with spatial computing. This exclusive collaboration brings together Rolex\'s precision engineering and Apple\'s revolutionary technology, creating a device that embodies luxury and innovation.',
-                rewards: [
-                    { icon: '🏔️', text: 'Exclusive Rolex Virtual Environment with Swiss Alps backdrop' },
-                    { icon: '💼', text: 'Free physical luxury travel case with Rolex branding' },
-                    { icon: '📜', text: 'Limited edition certificate of authenticity' },
-                    { icon: '🌐', text: 'Access to exclusive Rolex spatial computing experiences' }
-                ],
-                price: 5999
-            },
-            porsche: {
-                name: 'Porsche Edition',
-                icon: '🏎️',
-                title: 'Porsche Edition Vision Pro',
-                story: 'Where performance meets precision. The Porsche Edition Vision Pro combines automotive excellence with cutting-edge spatial computing, delivering an experience as refined as a Porsche sports car.',
-                rewards: [
-                    { icon: '🏭', text: 'Porsche Design Studio Virtual Environment' },
-                    { icon: '🎮', text: 'Custom Porsche-themed spatial computing interfaces' },
-                    { icon: '🏁', text: 'Exclusive Porsche racing experience in VR' },
-                    { icon: '📦', text: 'Premium carrying case with Porsche branding' }
-                ],
-                price: 5499
-            },
-            louisvuitton: {
-                name: 'Louis Vuitton Edition',
-                icon: '👜',
-                title: 'Louis Vuitton Edition Vision Pro',
-                story: 'Haute couture meets high technology. This collaboration celebrates the artistry of Louis Vuitton\'s craftsmanship, wrapped in the most advanced spatial computing platform.',
-                rewards: [
-                    { icon: '🏪', text: 'Louis Vuitton Virtual Boutique Experience' },
-                    { icon: '🎁', text: 'Luxury monogrammed carrying case' },
-                    { icon: '🌍', text: 'Exclusive LV-themed spatial environments' },
-                    { icon: '📋', text: 'Certificate of authenticity and limited edition number' }
-                ],
-                price: 6499
-            },
-            starbucks: {
-                name: 'Starbucks Edition',
-                icon: '☕',
-                title: 'Starbucks Edition Vision Pro',
-                story: 'Coffee culture reimagined in spatial computing. Experience the warmth and community of Starbucks through immersive virtual environments and exclusive content.',
-                rewards: [
-                    { icon: '🏛️', text: 'Virtual Starbucks Reserve Roastery experience' },
-                    { icon: '🎨', text: 'Starbucks-themed spatial computing environments' },
-                    { icon: '☕', text: 'Free Starbucks Reserve coffee subscription (6 months)' },
-                    { icon: '🎁', text: 'Exclusive Starbucks-branded accessories' }
-                ],
-                price: 3999
-            },
-            nike: {
-                name: 'Nike Edition',
-                icon: '✓',
-                title: 'Nike Edition Vision Pro',
-                story: 'Just Do It in spatial computing. The Nike Edition combines athletic performance with cutting-edge technology, empowering you to push boundaries.',
-                rewards: [
-                    { icon: '🏃', text: 'Nike Training Club Virtual Experience' },
-                    { icon: '👟', text: 'Exclusive Nike-themed spatial interfaces' },
-                    { icon: '🎯', text: 'Access to Nike athlete virtual meetups' },
-                    { icon: '📦', text: 'Nike-branded premium case' }
-                ],
-                price: 4299
-            },
-            supreme: {
-                name: 'Supreme Edition',
-                icon: '⬛',
-                title: 'Supreme Edition Vision Pro',
-                story: 'Street culture meets spatial computing. The Supreme Edition brings urban aesthetics and limited-edition exclusivity to Apple Vision Pro.',
-                rewards: [
-                    { icon: '🎨', text: 'Supreme-themed virtual environments' },
-                    { icon: '📦', text: 'Limited edition Supreme carrying case' },
-                    { icon: '🎫', text: 'Early access to Supreme drops in VR' },
-                    { icon: '👕', text: 'Exclusive Supreme digital collectibles' }
-                ],
-                price: 4799
-            },
-            lego: {
-                name: 'Lego Edition',
-                icon: '🧱',
-                title: 'Lego Edition Vision Pro',
-                story: 'Build your world in spatial computing. The Lego Edition combines creativity and play with advanced technology.',
-                rewards: [
-                    { icon: '🧱', text: 'Lego Builder Virtual Studio' },
-                    { icon: '🎮', text: 'Exclusive Lego building experiences' },
-                    { icon: '📦', text: 'Lego-themed carrying case' },
-                    { icon: '🎁', text: 'Digital Lego set collection' }
-                ],
-                price: 3799
-            },
-            nasa: {
-                name: 'NASA Edition',
-                icon: '🚀',
-                title: 'NASA Edition Vision Pro',
-                story: 'Explore the cosmos in spatial computing. The NASA Edition brings space exploration and scientific discovery to your fingertips.',
-                rewards: [
-                    { icon: '🌌', text: 'Virtual tours of the International Space Station' },
-                    { icon: '🪐', text: 'Interactive planetary exploration experiences' },
-                    { icon: '📦', text: 'NASA-branded premium case' },
-                    { icon: '🎓', text: 'Access to NASA educational content library' }
-                ],
-                price: 5199
-            },
-            balenciaga: {
-                name: 'Balenciaga Edition',
-                icon: '👔',
-                title: 'Balenciaga Edition Vision Pro',
-                story: 'High fashion meets high tech. The Balenciaga Edition represents avant-garde design in spatial computing.',
-                rewards: [
-                    { icon: '👗', text: 'Balenciaga Virtual Fashion Show' },
-                    { icon: '🛍️', text: 'Exclusive digital fashion collection' },
-                    { icon: '📦', text: 'Luxury Balenciaga carrying case' },
-                    { icon: '🎫', text: 'VIP access to Balenciaga events' }
-                ],
-                price: 6999
-            },
-            kaws: {
-                name: 'KAWS Edition',
-                icon: '🎨',
-                title: 'KAWS Edition Vision Pro',
-                story: 'Contemporary art in spatial computing. The KAWS Edition brings iconic art and collectibles into immersive digital spaces.',
-                rewards: [
-                    { icon: '🖼️', text: 'KAWS Virtual Art Gallery' },
-                    { icon: '🎨', text: 'Exclusive KAWS digital artworks' },
-                    { icon: '📦', text: 'KAWS-branded premium case' },
-                    { icon: '🎫', text: 'Access to KAWS exhibition previews' }
-                ],
-                price: 5799
-            }
+            rolex: { name: 'Rolex Edition', title: 'Rolex Edition Vision Pro', story: 'Merging timeless Swiss craftsmanship with spatial computing.', rewards: [{ icon: '🏔️', text: 'Rolex Virtual Environment' }, { icon: '💼', text: 'Luxury travel case' }, { icon: '📜', text: 'Certificate of authenticity' }], price: 5999 },
+            porsche: { name: 'Porsche Edition', title: 'Porsche Edition Vision Pro', story: 'Where performance meets precision.', rewards: [{ icon: '🏭', text: 'Porsche Design Studio VR' }, { icon: '🏁', text: 'Racing experience in VR' }, { icon: '📦', text: 'Premium carrying case' }], price: 5499 },
+            louisvuitton: { name: 'Louis Vuitton Edition', title: 'Louis Vuitton Edition Vision Pro', story: 'Haute couture meets high technology.', rewards: [{ icon: '🏪', text: 'LV Virtual Boutique' }, { icon: '🎁', text: 'Monogrammed case' }, { icon: '📋', text: 'Certificate of authenticity' }], price: 6499 },
+            starbucks: { name: 'Starbucks Edition', title: 'Starbucks Edition Vision Pro', story: 'Coffee culture in spatial computing.', rewards: [{ icon: '🏛️', text: 'Reserve Roastery VR' }, { icon: '☕', text: '6-month Reserve subscription' }, { icon: '🎁', text: 'Branded accessories' }], price: 3999 },
+            nike: { name: 'Nike Edition', title: 'Nike Edition Vision Pro', story: 'Just Do It in spatial computing.', rewards: [{ icon: '🏃', text: 'Nike Training Club VR' }, { icon: '👟', text: 'Nike spatial interfaces' }, { icon: '📦', text: 'Nike premium case' }], price: 4299 },
+            supreme: { name: 'Supreme Edition', title: 'Supreme Edition Vision Pro', story: 'Street culture meets spatial computing.', rewards: [{ icon: '🎨', text: 'Supreme virtual environments' }, { icon: '📦', text: 'Limited edition case' }, { icon: '🎫', text: 'Early access to drops' }], price: 4799 },
+            lego: { name: 'Lego Edition', title: 'Lego Edition Vision Pro', story: 'Build your world in spatial computing.', rewards: [{ icon: '🧱', text: 'Lego Builder Studio' }, { icon: '🎮', text: 'Lego building experiences' }, { icon: '📦', text: 'Lego carrying case' }], price: 3799 },
+            nasa: { name: 'NASA Edition', title: 'NASA Edition Vision Pro', story: 'Explore the cosmos in spatial computing.', rewards: [{ icon: '🌌', text: 'ISS virtual tours' }, { icon: '🪐', text: 'Planetary exploration' }, { icon: '📦', text: 'NASA premium case' }], price: 5199 },
+            balenciaga: { name: 'Balenciaga Edition', title: 'Balenciaga Edition Vision Pro', story: 'High fashion meets high tech.', rewards: [{ icon: '👗', text: 'Virtual Fashion Show' }, { icon: '🛍️', text: 'Digital fashion collection' }, { icon: '📦', text: 'Luxury carrying case' }], price: 6999 },
+            kaws: { name: 'KAWS Edition', title: 'KAWS Edition Vision Pro', story: 'Contemporary art in spatial computing.', rewards: [{ icon: '🖼️', text: 'KAWS Virtual Gallery' }, { icon: '🎨', text: 'Exclusive digital artworks' }, { icon: '📦', text: 'KAWS premium case' }], price: 5799 }
         };
 
-        // Material color options
         const materialColors = {
-            leather: [
-                { name: 'Midnight', value: '#111827' },
-                { name: 'Saddle Brown', value: '#78350f' },
-                { name: 'Crimson', value: '#7f1d1d' },
-                { name: 'Black', value: '#000000' }
-            ],
-            knit: [
-                { name: 'Navy', value: '#1e3a8a' },
-                { name: 'Gray', value: '#4b5563' },
-                { name: 'Beige', value: '#fef3c7' },
-                { name: 'Charcoal', value: '#374151' }
-            ],
-            silicone: [
-                { name: 'Black', value: '#000000' },
-                { name: 'White', value: '#ffffff' },
-                { name: 'Blue', value: '#2563eb' },
-                { name: 'Red', value: '#dc2626' }
-            ]
+            leather: [{ name: 'Midnight', value: '#111827' }, { name: 'Saddle Brown', value: '#78350f' }, { name: 'Crimson', value: '#7f1d1d' }, { name: 'Black', value: '#000000' }],
+            knit: [{ name: 'Navy', value: '#1e3a8a' }, { name: 'Gray', value: '#4b5563' }, { name: 'Beige', value: '#fef3c7' }, { name: 'Charcoal', value: '#374151' }],
+            silicone: [{ name: 'Black', value: '#000000' }, { name: 'White', value: '#ffffff' }, { name: 'Blue', value: '#2563eb' }, { name: 'Red', value: '#dc2626' }]
         };
 
-        // Position rotation angles
-        const positionAngles = {
-            top: { x: -20, y: 0 },
-            bottom: { x: 20, y: 0 },
-            side: { x: 0, y: 90 }
-        };
-
-        // Initialize 3D rotation handlers
-        function init3DRotation(containerId, objectId) {
-            const container = document.getElementById(containerId);
-            const object = document.getElementById(objectId);
-            
-            if (!container || !object) return;
-
-            container.addEventListener('mousedown', (e) => {
-                isDragging = true;
-                startX = e.clientX;
-                startY = e.clientY;
-                object.classList.remove('auto-rotating');
-            });
-
-            document.addEventListener('mousemove', (e) => {
-                if (!isDragging) return;
-
-                const deltaX = e.clientX - startX;
-                const deltaY = e.clientY - startY;
-
-                rotationY = currentRotationY + deltaX * 0.5;
-                rotationX = currentRotationX - deltaY * 0.5;
-
-                // Limit vertical rotation
-                rotationX = Math.max(-90, Math.min(90, rotationX));
-
-                object.style.transform = `rotateX(${rotationX}deg) rotateY(${rotationY}deg)`;
-            });
-
-            document.addEventListener('mouseup', () => {
-                if (isDragging) {
-                    isDragging = false;
-                    currentRotationX = rotationX;
-                    currentRotationY = rotationY;
-                }
-            });
-
-            // Touch support
-            container.addEventListener('touchstart', (e) => {
-                isDragging = true;
-                startX = e.touches[0].clientX;
-                startY = e.touches[0].clientY;
-                object.classList.remove('auto-rotating');
-            });
-
-            document.addEventListener('touchmove', (e) => {
-                if (!isDragging) return;
-                e.preventDefault();
-
-                const deltaX = e.touches[0].clientX - startX;
-                const deltaY = e.touches[0].clientY - startY;
-
-                rotationY = currentRotationY + deltaX * 0.5;
-                rotationX = currentRotationX - deltaY * 0.5;
-
-                rotationX = Math.max(-90, Math.min(90, rotationX));
-
-                object.style.transform = `rotateX(${rotationX}deg) rotateY(${rotationY}deg)`;
-            });
-
-            document.addEventListener('touchend', () => {
-                if (isDragging) {
-                    isDragging = false;
-                    currentRotationX = rotationX;
-                    currentRotationY = rotationY;
-                }
-            });
-        }
-
-        // Rotate to specific position
-        function rotateToPosition() {
-            const position = document.getElementById('engraving-position').value;
-            const angles = positionAngles[position];
-            const object = document.getElementById('object-3d-personalize');
-            
-            if (!object || !angles) return;
-
-            object.classList.add('auto-rotating');
-            currentRotationX = angles.x;
-            currentRotationY = angles.y;
-            rotationX = angles.x;
-            rotationY = angles.y;
-
-            object.style.transform = `rotateX(${angles.x}deg) rotateY(${angles.y}deg)`;
-        }
-
-        // Tab switching
         function switchTab(tabName) {
             currentTab = tabName;
-            
-            // Reset rotation
-            rotationX = 0;
-            rotationY = 0;
-            currentRotationX = 0;
-            currentRotationY = 0;
-            
-            const coObject = document.getElementById('object-3d-co');
-            const personalizeObject = document.getElementById('object-3d-personalize');
-            
-            if (coObject) {
-                coObject.style.transform = 'rotateX(0deg) rotateY(0deg)';
-            }
-            if (personalizeObject) {
-                personalizeObject.style.transform = 'rotateX(0deg) rotateY(0deg)';
-            }
-            
-            // Update tab buttons
-            document.querySelectorAll('.tab-button').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            document.getElementById(`tab-${tabName}`).classList.add('active');
-            
-            // Update tab content
-            document.querySelectorAll('.tab-content').forEach(content => {
-                content.classList.remove('active');
-            });
-            document.getElementById(`content-${tabName}`).classList.add('active');
-            
-            // Update sticky bar visibility
-            updateStickyBar();
+            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('tab-' + tabName).classList.add('active');
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.getElementById('content-' + tabName).classList.add('active');
         }
 
-        // Co-branded edition selection
-        function selectCoBrand(brand) {
+        function selectCoBrand(brand, cardEl) {
             selectedCoBrand = brand;
             const data = coBrandData[brand];
-            
             if (!data) return;
-            
-            // Update UI
-            document.getElementById('co-brand-icon').textContent = data.icon;
             document.getElementById('co-brand-title').textContent = data.title;
-            document.getElementById('co-brand-story').innerHTML = `<p class="text-sm">${data.story}</p>`;
-            
-            // Update rewards with visual cards
-            const rewardsList = document.getElementById('co-brand-rewards');
-            rewardsList.innerHTML = data.rewards.map(reward => `
-                <div class="reward-card">
-                    <div class="reward-image-placeholder">${reward.icon}</div>
-                    <p class="text-sm text-gray-300">${reward.text}</p>
-                </div>
-            `).join('');
-            
-            // Update price
+            document.getElementById('co-brand-story').innerHTML = '<p class="text-sm">' + data.story + '</p>';
+            document.getElementById('co-brand-rewards').innerHTML = data.rewards.map(r =>
+                '<div class="reward-card"><div class="reward-image-placeholder">' + r.icon + '</div><p class="text-sm text-gray-300">' + r.text + '</p></div>'
+            ).join('');
             currentPrice = data.price;
-            document.getElementById('co-brand-price').textContent = `$${data.price.toLocaleString()}`;
-            
-            // Update selected state
-            document.querySelectorAll('.brand-card').forEach(card => {
-                card.classList.remove('selected');
-            });
-            event.currentTarget.classList.add('selected');
+            document.getElementById('co-brand-price').textContent = '$' + data.price.toLocaleString();
+            document.querySelectorAll('.brand-card').forEach(c => c.classList.remove('selected'));
+            if (cardEl) cardEl.classList.add('selected');
         }
 
-        // Add co-branded to bag
+        function showToast() {
+            const toast = document.getElementById('toast');
+            toast.classList.remove('fade-out');
+            toast.classList.add('visible');
+            setTimeout(() => {
+                toast.classList.remove('visible');
+                toast.classList.add('fade-out');
+            }, 3000);
+        }
+
+        function setButtonAdded(buttonId) {
+            const btn = document.getElementById(buttonId);
+            if (!btn) return;
+            const origText = btn.textContent;
+            btn.textContent = 'Added to Bag ✓';
+            btn.classList.add('btn-added');
+            setTimeout(() => {
+                btn.textContent = origText;
+                btn.classList.remove('btn-added');
+            }, 3000);
+        }
+
         function addCoBrandToBag() {
             if (!selectedCoBrand) {
                 alert('Please select an edition first.');
                 return;
             }
-            
-            const data = coBrandData[selectedCoBrand];
-            alert(`Added to Bag!\n\n${data.title}\nPrice: $${data.price.toLocaleString()}`);
+            setButtonAdded('btn-add-co');
+            showToast();
         }
 
-        // Material selection
+        function addPersonalizeToBag() {
+            setButtonAdded('btn-add-personalize');
+            showToast();
+        }
+
         function updateMaterial() {
             selectedMaterial = document.getElementById('material-select').value;
             populateColorOptions();
-            updateMaterialOverlay();
+            applyHeadbandColor();
         }
 
-        // Populate color options based on material
         function populateColorOptions() {
             const colors = materialColors[selectedMaterial] || [];
             const container = document.getElementById('color-options');
-            
-            container.innerHTML = colors.map(color => `
-                <button 
-                    onclick="selectColor('${color.value}')"
-                    class="aspect-square rounded-lg border-2 border-transparent hover:border-white/50 transition-all hover:scale-110"
-                    style="background-color: ${color.value};"
-                    data-color="${color.value}"
-                    title="${color.name}"
-                ></button>
-            `).join('');
+            container.innerHTML = colors.map(c =>
+                '<button type="button" onclick="selectColor(\'' + c.value + '\')" class="aspect-square rounded-lg border-2 border-transparent hover:border-white/50 transition-all" style="background-color:' + c.value + '" data-color="' + c.value + '" title="' + c.name + '"></button>'
+            ).join('');
         }
 
-        // Color selection
         function selectColor(colorValue) {
             selectedColor = colorValue;
-            
-            // Update button states
             document.querySelectorAll('#color-options button').forEach(btn => {
-                btn.classList.remove('border-white');
-                if (btn.dataset.color === colorValue) {
-                    btn.classList.add('border-white');
-                }
+                btn.classList.toggle('border-white', btn.dataset.color === colorValue);
             });
-            
-            updateMaterialOverlay();
+            applyHeadbandColor();
             updatePrice();
         }
 
-        // Update material overlay
-        function updateMaterialOverlay() {
-            const overlay = document.getElementById('material-overlay');
-            if (selectedColor) {
-                overlay.style.backgroundColor = selectedColor;
-                overlay.classList.add('visible');
+        function hexToLinearRgb(hex) {
+            const r = parseInt(hex.slice(1, 3), 16) / 255;
+            const g = parseInt(hex.slice(3, 5), 16) / 255;
+            const b = parseInt(hex.slice(5, 7), 16) / 255;
+            const toLinear = c => c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+            return [toLinear(r), toLinear(g), toLinear(b), 1];
+        }
+
+        function applyHeadbandColor() {
+            const viewer = document.getElementById('model-viewer-personalize');
+            if (!viewer || !selectedColor) return;
+            function tryApply() {
+                try {
+                    const model = viewer.model;
+                    if (!model || !model.materials) return;
+                    const materials = model.materials;
+                    const colorFactor = hexToLinearRgb(selectedColor);
+                    var applied = false;
+                    for (let i = 0; i < materials.length; i++) {
+                        const mat = materials[i];
+                        var name = (mat.name || '').toLowerCase();
+                        if (name.indexOf('band') !== -1 || name.indexOf('strap') !== -1 || name.indexOf('headband') !== -1) {
+                            if (mat.pbrMetallicRoughness) {
+                                mat.pbrMetallicRoughness.setBaseColorFactor(colorFactor);
+                                applied = true;
+                            }
+                        }
+                    }
+                    if (!applied && materials.length > 0 && materials[0].pbrMetallicRoughness) {
+                        materials[0].pbrMetallicRoughness.setBaseColorFactor(colorFactor);
+                    }
+                } catch (e) {
+                    console.warn('Model-viewer material update:', e);
+                }
+            }
+            if (viewer.loaded) {
+                tryApply();
             } else {
-                overlay.classList.remove('visible');
+                viewer.addEventListener('load', tryApply);
             }
         }
 
-        // Update engraving preview
         function updateEngravingPreview() {
             const text = document.getElementById('engraving-text').value;
             const font = document.getElementById('engraving-font').value;
-            const size = parseInt(document.getElementById('engraving-size').value);
+            const size = parseInt(document.getElementById('engraving-size').value, 10);
             const color = document.getElementById('engraving-color').value;
             const position = document.getElementById('engraving-position').value;
-            
-            // Update config
             engravingConfig = { text, font, size, color, position };
-            
-            // Update preview text
-            const previewText = document.getElementById('engraving-text-3d');
-            
-            if (text.trim()) {
-                previewText.textContent = text.toUpperCase();
-                previewText.style.fontFamily = font;
-                previewText.style.fontSize = `${size}px`;
-                previewText.style.color = color;
-                
-                // Update position class
-                previewText.classList.remove('position-top', 'position-bottom', 'position-side');
-                previewText.classList.add(`position-${position}`);
-                
-                previewText.style.display = 'block';
-            } else {
-                previewText.style.display = 'none';
-            }
-            
-            // Update color hex display
             document.getElementById('color-hex').textContent = color.toUpperCase();
-            
-            updateStickyBar();
         }
 
-        // Update font size display
         function updateFontSizeDisplay() {
-            const size = document.getElementById('engraving-size').value;
-            document.getElementById('font-size-value').textContent = size;
+            document.getElementById('font-size-value').textContent = document.getElementById('engraving-size').value;
         }
 
-        // Update price
         function updatePrice() {
             let newPrice = basePrice;
-            
-            // Add material premium
-            const materialPremiums = {
-                leather: 200,
-                knit: 150,
-                silicone: 100
-            };
-            if (selectedMaterial && materialPremiums[selectedMaterial]) {
-                newPrice += materialPremiums[selectedMaterial];
-            }
-            
-            // Update price display
+            const premiums = { leather: 200, knit: 150, silicone: 100 };
+            if (selectedMaterial && premiums[selectedMaterial]) newPrice += premiums[selectedMaterial];
             if (newPrice !== currentPrice) {
                 currentPrice = newPrice;
-                const priceDisplay = document.getElementById('price-display');
-                priceDisplay.classList.add('price-bounce');
-                
-                const formattedPrice = newPrice.toLocaleString('en-US', {
-                    style: 'currency',
-                    currency: 'USD',
-                    minimumFractionDigits: 0,
-                    maximumFractionDigits: 0
-                });
-                
-                priceDisplay.textContent = formattedPrice;
-                
-                setTimeout(() => {
-                    priceDisplay.classList.remove('price-bounce');
-                }, 500);
+                const el = document.getElementById('price-display');
+                el.classList.add('price-bounce');
+                el.textContent = '$' + newPrice.toLocaleString();
+                setTimeout(() => el.classList.remove('price-bounce'), 500);
             }
         }
 
-        // Update sticky bar visibility
-        function updateStickyBar() {
-            const stickyBar = document.getElementById('sticky-checkout');
-            if (currentTab === 'personalize' && (selectedMaterial || engravingConfig.text)) {
-                stickyBar.classList.add('visible');
-            } else if (currentTab === 'co-branded' && selectedCoBrand) {
-                stickyBar.classList.add('visible');
-            } else {
-                stickyBar.classList.remove('visible');
-            }
-        }
-
-        // Add to bag
-        function addToBag() {
-            if (currentTab === 'co-branded') {
-                addCoBrandToBag();
-            } else {
-                const config = {
-                    material: selectedMaterial || 'default',
-                    color: selectedColor || 'default',
-                    engraving: engravingConfig
-                };
-                
-                alert(`Added to Bag!\n\nConfiguration:\n• Material: ${config.material}\n• Color: ${config.color}\n• Engraving: ${config.engraving.text || 'None'}\n• Price: ${currentPrice.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}`);
-            }
-        }
-
-        // Scroll to main content
         function scrollToMain() {
-            document.getElementById('main-content').scrollIntoView({ 
-                behavior: 'smooth',
-                block: 'start'
-            });
+            document.getElementById('main-content').scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
-        // Initialize
         document.addEventListener('DOMContentLoaded', () => {
-            // Initialize 3D rotations
-            init3DRotation('content-co-branded', 'object-3d-co');
-            init3DRotation('content-personalize', 'object-3d-personalize');
-            
-            // Initialize material colors
             populateColorOptions();
-            
-            // Initialize color picker hex display
-            const colorPicker = document.getElementById('engraving-color');
-            colorPicker.addEventListener('input', function() {
+            document.getElementById('engraving-color').addEventListener('input', function() {
                 document.getElementById('color-hex').textContent = this.value.toUpperCase();
             });
+            const viewer = document.getElementById('model-viewer-personalize');
+            if (viewer) {
+                viewer.addEventListener('load', () => applyHeadbandColor());
+            }
         });
     </script>
 </body>
