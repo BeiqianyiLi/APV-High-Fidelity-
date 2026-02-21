@@ -1,7 +1,7 @@
 # Apple Vision Pro - Customization Prototype
 
 ## Disclaimer
-This project is an independent open-source conceptual prototype created solely for the CraterHacks 404 Hackathon. It is not affiliated with, endorsed by, or sponsored by Apple Inc., ZEISS, or any mentioned co-branded entities (Rolex, Porsche, etc.). 
+This project is an independent open-source conceptual prototype created solely for the CraterHacks 404 Hackathon. It is not affiliated with, endorsed by, or sponsored by Apple Inc., or any mentioned co-branded entities (Rolex, Porsche, etc.). 
 
 ## Project Overview
 Built for "Experiencers" (consumers seeking novelty and social identity), this high-fidelity interactive prototype explores the future of spatial computing e-commerce. 
