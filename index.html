@@ -502,8 +502,8 @@
                                 <input type="range" id="engraving-bend" min="-60" max="60" value="0" step="1" oninput="updateBendDisplay(); updateEngravingPreview();" class="w-full" />
                             </div>
                             <div class="mb-4">
-                                <label class="text-sm font-medium text-gray-300 mb-2 block">3D Bend Left/Right: <span id="bend-y-value">0</span>°</label>
-                                <input type="range" id="engraving-bend-y" min="-60" max="60" value="0" step="1" oninput="updateBendYDisplay(); updateEngravingPreview();" class="w-full" />
+                                <label class="text-sm font-medium text-gray-300 mb-2 block">3D Bend (Front/Back): <span id="bend-front-back-value">0</span>°</label>
+                                <input type="range" id="engraving-bend-front-back" min="-60" max="60" value="0" step="1" oninput="updateBendFrontBackDisplay(); updateEngravingPreview();" class="w-full" />
                             </div>
                             <div class="mb-4">
                                 <label class="text-sm font-medium text-gray-300 mb-2 block">Text Color</label>
@@ -550,7 +550,7 @@
         let currentTab = 'co-branded';
         let selectedCoBrand = null;
         let selectedEyeSight = 'standard';
-        let engravingConfig = { text: '', font: 'Arial', size: 24, color: '#ffffff', rotation: 0, bend: 0, bendY: 0 };
+        let engravingConfig = { text: '', font: 'Arial', size: 24, color: '#ffffff', rotation: 0, bend: 0, bendFrontBack: 0 };
         let engravingLocked = false;
         let decalInitialOrbit = null;
         let basePrice = 3499;
@@ -644,9 +644,10 @@
             if (!el) return;
             var rotation = parseInt(document.getElementById('engraving-rotation') && document.getElementById('engraving-rotation').value, 10) || 0;
             var bend = parseInt(document.getElementById('engraving-bend') && document.getElementById('engraving-bend').value, 10) || 0;
-            var bendY = parseInt(document.getElementById('engraving-bend-y') && document.getElementById('engraving-bend-y').value, 10) || 0;
+            var bendFrontBack = parseInt(document.getElementById('engraving-bend-front-back') && document.getElementById('engraving-bend-front-back').value, 10) || 0;
             var left = el.style.left;
-            var t = 'perspective(500px) rotateX(' + bend + 'deg) rotateY(' + bendY + 'deg) rotateZ(' + rotation + 'deg)';
+            var tiltX = bend + bendFrontBack;
+            var t = 'perspective(500px) rotateX(' + tiltX + 'deg) rotateZ(' + rotation + 'deg)';
             if (!left || left.indexOf('%') !== -1) t = 'translateX(-50%) ' + t;
             el.style.transform = t;
         }
@@ -659,11 +660,12 @@
             var color = (document.getElementById('engraving-color') && document.getElementById('engraving-color').value) || '#ffffff';
             var rotation = parseInt(document.getElementById('engraving-rotation') && document.getElementById('engraving-rotation').value, 10) || 0;
             var bend = parseInt(document.getElementById('engraving-bend') && document.getElementById('engraving-bend').value, 10) || 0;
-            var bendY = parseInt(document.getElementById('engraving-bend-y') && document.getElementById('engraving-bend-y').value, 10) || 0;
+            var bendFrontBack = parseInt(document.getElementById('engraving-bend-front-back') && document.getElementById('engraving-bend-front-back').value, 10) || 0;
             var floatingEl = document.getElementById('floating-engraving');
             if (document.getElementById('color-hex')) document.getElementById('color-hex').textContent = color.toUpperCase();
-            engravingConfig = { text: text, font: font, size: size, color: color, rotation: rotation, bend: bend, bendY: bendY };
-            var t = 'perspective(500px) rotateX(' + bend + 'deg) rotateY(' + bendY + 'deg) rotateZ(' + rotation + 'deg)';
+            engravingConfig = { text: text, font: font, size: size, color: color, rotation: rotation, bend: bend, bendFrontBack: bendFrontBack };
+            var tiltX = bend + bendFrontBack;
+            var t = 'perspective(500px) rotateX(' + tiltX + 'deg) rotateZ(' + rotation + 'deg)';
             if (engravingLocked) {
                 var content = document.getElementById('hotspot-content');
                 if (content) {
@@ -702,9 +704,9 @@
             var el = document.getElementById('engraving-bend');
             if (el) document.getElementById('bend-value').textContent = el.value;
         }
-        function updateBendYDisplay() {
-            var el = document.getElementById('engraving-bend-y');
-            if (el) document.getElementById('bend-y-value').textContent = el.value;
+        function updateBendFrontBackDisplay() {
+            var el = document.getElementById('engraving-bend-front-back');
+            if (el) document.getElementById('bend-front-back-value').textContent = el.value;
         }
 
         function calculateTotal() {
@@ -766,7 +768,7 @@
             if (!contentEl) return;
             var rotation = parseInt(document.getElementById('engraving-rotation') && document.getElementById('engraving-rotation').value, 10) || 0;
             var bend = parseInt(document.getElementById('engraving-bend') && document.getElementById('engraving-bend').value, 10) || 0;
-            var bendY = parseInt(document.getElementById('engraving-bend-y') && document.getElementById('engraving-bend-y').value, 10) || 0;
+            var bendFrontBack = parseInt(document.getElementById('engraving-bend-front-back') && document.getElementById('engraving-bend-front-back').value, 10) || 0;
             var deltaTheta = 0, deltaPhi = 0;
             if (engravingLocked && decalInitialOrbit) {
                 var mv = document.querySelector('#model-viewer-personalize');
@@ -777,7 +779,8 @@
                 }
             }
             var orbitRot = 'rotateY(' + deltaTheta + 'rad) rotateX(' + deltaPhi + 'rad)';
-            var userRot = ' rotateZ(' + rotation + 'deg) rotateX(' + bend + 'deg) rotateY(' + bendY + 'deg)';
+            var tiltX = bend + bendFrontBack;
+            var userRot = ' rotateZ(' + rotation + 'deg) rotateX(' + tiltX + 'deg)';
             contentEl.style.transform = orbitRot + userRot;
         }
 
@@ -878,9 +881,9 @@
                     var containerRect = viewerArea ? viewerArea.getBoundingClientRect() : rect;
                     startLeft = rect.left - containerRect.left;
                     startTop = rect.top - containerRect.top;
-                    floatingEl.style.transform = 'none';
                     floatingEl.style.left = startLeft + 'px';
                     floatingEl.style.top = startTop + 'px';
+                    applyEngraving3DTransform();
                     floatingEl.style.cursor = 'grabbing';
                     document.addEventListener('mousemove', onMove);
                     document.addEventListener('mouseup', onUp);
