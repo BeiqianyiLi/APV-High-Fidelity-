@@ -2,13 +2,18 @@
 
 ```mermaid
 graph TD
-    A[1. Landing Page: High-tech vibe & 'Start Customizing' CTA] --> B[2. Co-branding Hub: Display partner brand logos]
-    B -->|User selects a brand| C{3. Customization Studio}
-    C -->|Action 1| D[Switch to brand-exclusive UI/Virtual Environment]
-    C -->|Action 2| E[Change virtual band/headband materials]
-    C -->|Action 3| F[Add personalized laser engraving]
-    D --> G[4. Preview & Showcase: Confirm final look]
-    E --> G
-    F --> G
-    G --> H[5. Checkout: Dynamic pricing & 'Add to Bag']
+    A[1. Landing Page: 'Customize Your Vision' & 'Start Exploring' CTA] --> B[2. Main Hub: Dual-Mode Navigation]
+    
+    B -->|Tab 1| C[3A. Co-Branded Editions]
+    B -->|Tab 2| D[3B. Personalize Your Own]
+    
+    C -->|Select Brand| E[View Brand Slogan & Exclusive Rewards]
+    E --> I[5. Checkout: Dynamic Pricing & 'Add to Bag']
+    
+    D -->|Action 1| F[Customize External EyeSight Display]
+    D -->|Action 2| G[Advanced 3D Engraving: Text, Font, Bend, Color]
+    G --> H[Lock to Product: Real-time 3D Anchoring]
+    
+    F --> I
+    H --> I
 ```
