@@ -440,13 +440,6 @@
                             </div>
                         </model-viewer>
                         <div id="floating-engraving" style="position: absolute; top: 30%; left: 50%; transform: translateX(-50%); cursor: grab; user-select: none; z-index: 50; display: none; text-shadow: 0px 2px 4px rgba(0,0,0,0.5); white-space: nowrap;"></div>
-                        <div class="absolute bottom-4 right-4 z-50 flex flex-col items-end gap-1.5">
-                            <span class="text-[10px] font-medium uppercase tracking-widest text-white/60">TEXT PLACEMENT</span>
-                            <button type="button" id="btn-lock-engraving" onclick="toggleEngravingLock()" class="text-placements-btn rounded-full px-4 py-2.5 bg-white/10 backdrop-blur-md border border-white/20 text-sm font-medium text-white/95 hover:bg-white/15 active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2 shadow-lg">
-                                <span id="lock-engraving-icon" aria-hidden="true">🔓</span>
-                                <span id="lock-engraving-label">Lock to Product</span>
-                            </button>
-                        </div>
                     </div>
 
                     <!-- Right: Customization + Price at bottom -->
@@ -505,11 +498,20 @@
                                 <label class="text-sm font-medium text-gray-300 mb-2 block">3D Bend (Front/Back): <span id="bend-front-back-value">0</span>°</label>
                                 <input type="range" id="engraving-bend-front-back" min="-60" max="60" value="0" step="1" oninput="updateBendFrontBackDisplay(); updateEngravingPreview();" class="w-full" />
                             </div>
-                            <div class="mb-4">
-                                <label class="text-sm font-medium text-gray-300 mb-2 block">Text Color</label>
-                                <div class="flex items-center gap-4">
-                                    <input type="color" id="engraving-color" value="#ffffff" onchange="updateEngravingPreview()" class="w-12 h-12 rounded-lg cursor-pointer border-2 border-white/20" />
-                                    <span id="color-hex" class="text-gray-400 text-xs">#ffffff</span>
+                            <div class="flex items-end justify-between gap-4 mb-4">
+                                <div class="flex flex-col min-w-0">
+                                    <label class="text-sm font-medium text-gray-300 mb-2 block">Text Color</label>
+                                    <div class="flex items-center gap-4">
+                                        <input type="color" id="engraving-color" value="#ffffff" onchange="updateEngravingPreview()" class="w-12 h-12 rounded-lg cursor-pointer border-2 border-white/20 flex-shrink-0" />
+                                        <span id="color-hex" class="text-gray-400 text-xs">#ffffff</span>
+                                    </div>
+                                </div>
+                                <div class="flex flex-col items-end flex-shrink-0">
+                                    <span class="text-[10px] font-medium uppercase tracking-widest text-white/60 mb-2 block">TEXT PLACEMENT</span>
+                                    <button type="button" id="btn-lock-engraving" onclick="toggleEngravingLock()" class="rounded-full px-4 py-2.5 bg-white/10 backdrop-blur-md border border-white/20 text-sm font-medium text-white/95 hover:bg-white/15 active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2 shadow-lg whitespace-nowrap">
+                                        <span id="lock-engraving-icon" aria-hidden="true">🔓</span>
+                                        <span id="lock-engraving-label">Lock to Product</span>
+                                    </button>
                                 </div>
                             </div>
                         </div>
